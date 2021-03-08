@@ -3,7 +3,7 @@ Projeto da disciplina de Desenvolvimento de Sistemas Web II(DIM0547) da Universi
 
 ## Autores
 - [Gabriel Igor Queiroz Costa](https://github.com/gabriel-igorq)
-- [Mariana Lima Silva] 
+- [Mariana Lima Silva](https://github.com/marianalimans)
 
 ## Linguagem
 - Rust

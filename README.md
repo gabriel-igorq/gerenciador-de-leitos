@@ -1,5 +1,5 @@
 # Gerenciador de Leitos
-Projeto da disciplina de Desenvolvimento de Sistemas Web II(DIM0547) da Universidade Federal do Rio Grande do Norte
+Projeto da disciplina de Desenvolvimento de Sistemas Web II (DIM0547) da Universidade Federal do Rio Grande do Norte
 
 ## Autores
 - [Gabriel Igor Queiroz Costa](https://github.com/gabriel-igorq)

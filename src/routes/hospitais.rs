@@ -103,7 +103,40 @@ pub async fn get_all_unidades(
     Ok(HttpResponse::Ok().json(unidades))
 }
 
-pub async fn update_unidades(
+pub async fn get_unidade_by_id(
+    req: web::HttpRequest,
+    pool: web::Data<PgPool>
+) -> Result<HttpResponse, HttpResponse>  {
+
+    let id:Uuid = req.match_info().get("id").unwrap().parse().unwrap();
+
+    let row = sqlx::query!(
+        r#"
+        SELECT id, email, nome, tipo, municipio
+        FROM unidadeSaude
+        WHERE id = $1
+        "#,
+        id,
+    )
+    .fetch_one(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Failed to execute query: {}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
+
+    let unidade = UnidadeSaude{
+        id: row.id,
+        email: row.email,
+        nome: row.nome,
+        tipo: row.tipo,
+        municipio: row.municipio
+    };
+
+    Ok(HttpResponse::Ok().json(&unidade))
+}
+
+pub async fn update_unidade(
     unidade_saude: web::Json<UnidadeSaude>,
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -119,6 +152,30 @@ pub async fn update_unidades(
         unidade_saude.tipo,
         unidade_saude.municipio,
         unidade_saude.id
+    )
+    .execute(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Failed to execute query: {}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
+
+    Ok(HttpResponse::Ok().finish())
+}
+
+pub async fn delete_unidade(
+    req: web::HttpRequest,
+    pool: web::Data<PgPool>
+) -> Result<HttpResponse, HttpResponse>  {
+
+    let id:Uuid = req.match_info().get("id").unwrap().parse().unwrap();
+
+    sqlx::query!(
+        r#"
+        DELETE FROM unidadeSaude
+        WHERE id = $1
+        "#,
+        id
     )
     .execute(pool.get_ref())
     .await

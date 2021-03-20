@@ -13,6 +13,7 @@ pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Er
             .route("/ping", web::get().to(ping))
             .route("/unidades", web::post().to(create_unidade))
             .route("/unidades", web::get().to(get_all_unidades))
+            .route("/unidades", web::put().to(update_unidades))
             // Our pool is already wrapped in a Data: 
             // using .data would add another Arc pointer on top 
             // of the existing one - an unnecessary indirection.

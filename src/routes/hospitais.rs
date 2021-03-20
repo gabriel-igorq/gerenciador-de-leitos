@@ -102,3 +102,30 @@ pub async fn get_all_unidades(
 
     Ok(HttpResponse::Ok().json(unidades))
 }
+
+pub async fn update_unidades(
+    unidade_saude: web::Json<UnidadeSaude>,
+    pool: web::Data<PgPool>
+) -> Result<HttpResponse, HttpResponse>  {
+
+    sqlx::query!(
+        r#"
+        UPDATE unidadeSaude
+        SET nome = $1, email = $2, tipo = $3, municipio = $4
+        WHERE id = $5
+        "#,
+        unidade_saude.nome,
+        unidade_saude.email,
+        unidade_saude.tipo,
+        unidade_saude.municipio,
+        unidade_saude.id
+    )
+    .execute(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Failed to execute query: {}", e);
+        HttpResponse::InternalServerError().finish()
+    })?;
+
+    Ok(HttpResponse::Ok().finish())
+}

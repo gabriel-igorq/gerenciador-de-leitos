@@ -1,5 +1,5 @@
 //! src/startup.rs
-use crate::routes::{ping, cadastrar};
+use crate::routes::*;
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
 use sqlx::PgPool;
@@ -11,7 +11,8 @@ pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Er
     let server = HttpServer::new(move || {
         App::new()
             .route("/ping", web::get().to(ping))
-            .route("/hospitais", web::post().to(cadastrar))
+            .route("/unidades", web::post().to(create_unidade))
+            .route("/unidades", web::get().to(get_all_unidades))
             // Our pool is already wrapped in a Data: 
             // using .data would add another Arc pointer on top 
             // of the existing one - an unnecessary indirection.

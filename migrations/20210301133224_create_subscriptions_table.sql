@@ -5,7 +5,6 @@ CREATE TABLE unidadeSaude(
 	   email TEXT NOT NULL UNIQUE,
 	   nome TEXT NOT NULL,
 	   tipo TEXT NOT NULL,
-	   municipio TEXT NOT NULL,
-	   subscribed_at timestamptz NOT NULL
+	   municipio TEXT NOT NULL
 );
 

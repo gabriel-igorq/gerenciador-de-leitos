@@ -1,7 +1,6 @@
 use serde::{Serialize, Deserialize};
 use actix_web::{web, HttpResponse};
 use sqlx::{PgPool, types::Uuid};
-use chrono::Utc;
 use super::serializers::my_uuid;
 
 //#[derive(serde::Deserialize)]
@@ -36,8 +35,8 @@ pub async fn create_unidade(
     
     let row = sqlx::query!(
         r#"
-        INSERT INTO unidadeSaude (id, email, nome, tipo, municipio, subscribed_at)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO unidadeSaude (id, email, nome, tipo, municipio)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING id
         "#,
         Uuid::new_v4(),
@@ -45,7 +44,6 @@ pub async fn create_unidade(
         unidade_saude.nome,
         unidade_saude.tipo,
         unidade_saude.municipio,
-        Utc::now()
     )
     // We got rid of the double-wrapping using .app_data()
     .fetch_one(pool.get_ref())

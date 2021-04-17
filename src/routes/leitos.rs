@@ -5,45 +5,44 @@ use super::serializers::my_uuid;
 
 //#[derive(serde::Deserialize)]
 #[derive(Serialize, Deserialize)]
-pub struct UnidadeSaude {
+pub struct Leito {
     #[serde(with = "my_uuid")]
     pub id: Uuid,
-    pub email: String,
-    pub nome: String,
     pub tipo: String,
-    pub municipio: String
-}
-
-#[derive(Deserialize)]
-pub struct UnidadeData {
-    pub email: String,
-    pub nome: String,
-    pub tipo: String,
-    pub municipio: String
+    pub situacao: String,
+    #[serde(with = "my_uuid")]
+    pub unidade_id: Uuid
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct UnidadeId {
+pub struct LeitoData {
+    pub tipo: String,
+    pub situacao: String,
+    #[serde(with = "my_uuid")]
+    pub unidade_id: Uuid
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LeitoId {
     #[serde(with = "my_uuid")]
     pub id: Uuid,
 }
 
-pub async fn create_unidade(
-    unidade_saude: web::Json<UnidadeData>,
+pub async fn create_leito(
+    leito: web::Json<LeitoData>,
     pool: web::Data<PgPool>, // Renamed!
 ) -> Result<HttpResponse, HttpResponse> {
     
     let row = sqlx::query!(
         r#"
-        INSERT INTO unidadeSaude (id, email, nome, tipo, municipio)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO leito (id, tipo, situacao, unidade_id)
+        VALUES ($1, $2, $3, $4)
         RETURNING id
         "#,
         Uuid::new_v4(),
-        unidade_saude.email,
-        unidade_saude.nome,
-        unidade_saude.tipo,
-        unidade_saude.municipio,
+        leito.tipo,
+        leito.situacao,
+        leito.unidade_id,
     )
     // We got rid of the double-wrapping using .app_data()
     .fetch_one(pool.get_ref())
@@ -61,22 +60,21 @@ pub async fn create_unidade(
     //     municipio: row.municipio
     // };
 
-    let unidade = UnidadeId{
+    let leito = LeitoId{
         id: row.id
     };
 
-    Ok(HttpResponse::Ok().json(&unidade))
+    Ok(HttpResponse::Ok().json(&leito))
     //Ok(HttpResponse::Ok().finish())
 }
 
-pub async fn get_all_unidades(
+pub async fn get_all_leitos(
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
-
     let rows = sqlx::query!(
         r#"
-        SELECT id, nome, email, tipo, municipio
-        FROM unidadeSaude
+        SELECT id, tipo, situacao, unidade_id
+        FROM leito
         ORDER BY id
         "#
     )
@@ -87,22 +85,21 @@ pub async fn get_all_unidades(
         HttpResponse::InternalServerError().finish()
     })?;
 
-    let mut unidades: Vec<UnidadeSaude> = Vec::new();
+    let mut leitos: Vec<Leito> = Vec::new();
     for row in rows {
-        let user = UnidadeSaude {
+        let leito = Leito {
             id: row.id,
-            email: row.email,
-            nome: row.nome,
             tipo: row.tipo,
-            municipio: row.municipio
+            situacao: row.situacao,
+            unidade_id: row.unidade_id
         };
-        unidades.push(user);
+        leitos.push(leito);
     }
 
-    Ok(HttpResponse::Ok().json(unidades))
+    Ok(HttpResponse::Ok().json(leitos))
 }
 
-pub async fn get_unidade_by_id(
+pub async fn get_leito_by_id(
     req: web::HttpRequest,
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -111,8 +108,8 @@ pub async fn get_unidade_by_id(
 
     let row = sqlx::query!(
         r#"
-        SELECT id, email, nome, tipo, municipio
-        FROM unidadeSaude
+        SELECT id, tipo, situacao, unidade_id
+        FROM leito
         WHERE id = $1
         "#,
         id,
@@ -124,66 +121,31 @@ pub async fn get_unidade_by_id(
         HttpResponse::InternalServerError().finish()
     })?;
 
-    let unidade = UnidadeSaude{
+    let leito = Leito {
         id: row.id,
-        email: row.email,
-        nome: row.nome,
         tipo: row.tipo,
-        municipio: row.municipio
+        situacao: row.situacao,
+        unidade_id: row.unidade_id
     };
 
-    Ok(HttpResponse::Ok().json(&unidade))
+    Ok(HttpResponse::Ok().json(&leito))
 }
 
-pub async fn get_unidades_com_leitos(
-    pool: web::Data<PgPool>
-) -> Result<HttpResponse, HttpResponse>  {
-
-    let rows = sqlx::query!(
-        r#"
-        SELECT DISTINCT U.id, U.nome, U.email, U.tipo, U.municipio
-        FROM unidadesaude as U JOIN leito as L ON U.id = L.unidade_id
-        WHERE situacao != 'Ocupado'
-        "#,
-    )
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Failed to execute query: {}", e);
-        HttpResponse::InternalServerError().finish()
-    })?;
-
-    let mut unidades: Vec<UnidadeSaude> = Vec::new();
-    for row in rows {
-        let unidade = UnidadeSaude {
-            id: row.id,
-            email: row.email,
-            nome: row.nome,
-            tipo: row.tipo,
-            municipio: row.municipio
-        };
-        unidades.push(unidade);
-    }
-
-    Ok(HttpResponse::Ok().json(unidades))
-}
-
-pub async fn update_unidade(
-    unidade_saude: web::Json<UnidadeSaude>,
+pub async fn update_leito(
+    leito: web::Json<Leito>,
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
 
     sqlx::query!(
         r#"
-        UPDATE unidadeSaude
-        SET nome = $1, email = $2, tipo = $3, municipio = $4
-        WHERE id = $5
+        UPDATE leito
+        SET tipo = $1, situacao = $2, unidade_id = $3
+        WHERE id = $4
         "#,
-        unidade_saude.nome,
-        unidade_saude.email,
-        unidade_saude.tipo,
-        unidade_saude.municipio,
-        unidade_saude.id
+        leito.tipo,
+        leito.situacao,
+        leito.unidade_id,
+        leito.id
     )
     .execute(pool.get_ref())
     .await
@@ -195,7 +157,7 @@ pub async fn update_unidade(
     Ok(HttpResponse::Ok().finish())
 }
 
-pub async fn delete_unidade(
+pub async fn delete_leito(
     req: web::HttpRequest,
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -204,7 +166,7 @@ pub async fn delete_unidade(
 
     sqlx::query!(
         r#"
-        DELETE FROM unidadeSaude
+        DELETE FROM leito
         WHERE id = $1
         "#,
         id

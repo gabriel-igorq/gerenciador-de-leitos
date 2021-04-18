@@ -28,7 +28,7 @@ pub struct UnidadeId {
     pub id: Uuid,
 }
 
-#[tracing::instrument(name = "Create unidade", skip(unidade_saude, pool))]
+#[tracing::instrument(name = "Criar unidade", skip(unidade_saude, pool))]
 pub async fn create_unidade(
     unidade_saude: web::Json<UnidadeData>,
     pool: web::Data<PgPool>, // Renamed!
@@ -70,7 +70,7 @@ pub async fn create_unidade(
     //Ok(HttpResponse::Ok().finish())
 }
 
-#[tracing::instrument(name = "Get all unidades", skip(pool))]
+#[tracing::instrument(name = "Listar unidades", skip(pool))]
 pub async fn get_all_unidades(
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -104,7 +104,7 @@ pub async fn get_all_unidades(
     Ok(HttpResponse::Ok().json(unidades))
 }
 
-#[tracing::instrument(name = "Get unidade by id", skip(req, pool))]
+#[tracing::instrument(name = "Listar unidade por id", skip(req, pool))]
 pub async fn get_unidade_by_id(
     req: web::HttpRequest,
     pool: web::Data<PgPool>
@@ -138,7 +138,7 @@ pub async fn get_unidade_by_id(
     Ok(HttpResponse::Ok().json(&unidade))
 }
 
-#[tracing::instrument(name = "Get unidades com leitos", skip(pool))]
+#[tracing::instrument(name = "Listar unidades com leitos vazios", skip(pool))]
 pub async fn get_unidades_com_leitos(
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -172,7 +172,7 @@ pub async fn get_unidades_com_leitos(
     Ok(HttpResponse::Ok().json(unidades))
 }
 
-#[tracing::instrument(name = "Update unidade", skip(unidade_saude, pool))]
+#[tracing::instrument(name = "Atualizar unidade", skip(unidade_saude, pool))]
 pub async fn update_unidade(
     unidade_saude: web::Json<UnidadeSaude>,
     pool: web::Data<PgPool>
@@ -200,7 +200,7 @@ pub async fn update_unidade(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[tracing::instrument(name = "Delete unidade", skip(req, pool))]
+#[tracing::instrument(name = "Deletar unidade", skip(req, pool))]
 pub async fn delete_unidade(
     req: web::HttpRequest,
     pool: web::Data<PgPool>

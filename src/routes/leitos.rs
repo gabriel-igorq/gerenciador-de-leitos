@@ -28,6 +28,7 @@ pub struct LeitoId {
     pub id: Uuid,
 }
 
+#[tracing::instrument(name = "Criar leito", skip(leito, pool))]
 pub async fn create_leito(
     leito: web::Json<LeitoData>,
     pool: web::Data<PgPool>, // Renamed!
@@ -68,6 +69,7 @@ pub async fn create_leito(
     //Ok(HttpResponse::Ok().finish())
 }
 
+#[tracing::instrument(name = "Listar leitos", skip(pool))]
 pub async fn get_all_leitos(
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -99,6 +101,7 @@ pub async fn get_all_leitos(
     Ok(HttpResponse::Ok().json(leitos))
 }
 
+#[tracing::instrument(name = "Listar leito por id", skip(req, pool))]
 pub async fn get_leito_by_id(
     req: web::HttpRequest,
     pool: web::Data<PgPool>
@@ -131,6 +134,7 @@ pub async fn get_leito_by_id(
     Ok(HttpResponse::Ok().json(&leito))
 }
 
+#[tracing::instrument(name = "Atualizar leito", skip(leito, pool))]
 pub async fn update_leito(
     leito: web::Json<Leito>,
     pool: web::Data<PgPool>
@@ -157,6 +161,7 @@ pub async fn update_leito(
     Ok(HttpResponse::Ok().finish())
 }
 
+#[tracing::instrument(name = "Deletar leito", skip(req, pool))]
 pub async fn delete_leito(
     req: web::HttpRequest,
     pool: web::Data<PgPool>

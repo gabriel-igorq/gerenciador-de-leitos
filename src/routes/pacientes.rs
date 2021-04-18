@@ -46,6 +46,7 @@ pub struct Quantidade {
     pub quantidade: i32,
 }
 
+#[tracing::instrument(name = "Criar paciente", skip(paciente, pool))]
 pub async fn create_paciente(
     paciente: web::Json<PacienteData>,
     pool: web::Data<PgPool>, // Renamed!
@@ -82,6 +83,7 @@ pub async fn create_paciente(
     //Ok(HttpResponse::Ok().finish())
 }
 
+#[tracing::instrument(name = "Listar pacientes", skip(pool))]
 pub async fn get_all_pacientes(
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse, HttpResponse>  {
@@ -117,6 +119,7 @@ pub async fn get_all_pacientes(
     Ok(HttpResponse::Ok().json(pacientes))
 }
 
+#[tracing::instrument(name = "Listar paciente por id", skip(req, pool))]
 pub async fn get_paciente_by_id(
     req: web::HttpRequest,
     pool: web::Data<PgPool>
@@ -153,6 +156,7 @@ pub async fn get_paciente_by_id(
     Ok(HttpResponse::Ok().json(&paciente))
 }
 
+#[tracing::instrument(name = "Listar pacientes com covid", skip(req, pool))]
 pub async fn get_pacientes_covid(
     req: web::HttpRequest,
     pool: web::Data<PgPool>
@@ -193,6 +197,7 @@ pub async fn get_pacientes_covid(
     Ok(HttpResponse::Ok().json(pacientes))
 }
 
+#[tracing::instrument(name = "Atualizar paciente", skip(paciente, pool))]
 pub async fn update_paciente(
     paciente: web::Json<Paciente>,
     pool: web::Data<PgPool>
@@ -224,6 +229,7 @@ pub async fn update_paciente(
     Ok(HttpResponse::Ok().finish())
 }
 
+#[tracing::instrument(name = "Deletar paciente", skip(req, pool))]
 pub async fn delete_paciente(
     req: web::HttpRequest,
     pool: web::Data<PgPool>

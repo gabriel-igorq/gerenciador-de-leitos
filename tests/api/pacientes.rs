@@ -1,7 +1,7 @@
 use crate::helpers::create_app;
 use std::collections::HashMap;
 use reqwest::Response;
-use gerenciador_leitos::routes::{ UnidadeId, Leito, LeitoId, Paciente, PacienteId};
+use gerenciador_leitos::routes::{ UnidadeId, LeitoId, Paciente, PacienteId};
 use sqlx::{Row};
 
 #[actix_rt::test]

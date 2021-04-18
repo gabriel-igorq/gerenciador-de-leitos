@@ -5,6 +5,16 @@ use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
 use gerenciador_leitos::routes::{UnidadeData, LeitoData, PacienteData};
 use std::collections::HashMap;
+use gerenciador_leitos::telemetry::{get_subscriber, init_subscriber};
+
+// Ensure that the `tracing` stack is only initialised once using `lazy_static`
+lazy_static::lazy_static! {
+    static ref TRACING: () = {
+        let filter = if std::env::var("TEST_LOG").is_ok() { "debug" } else { "" };
+        let subscriber = get_subscriber("test".into(), filter.into());
+        init_subscriber(subscriber);
+    };
+}
 
 pub struct TestApp {
     pub address: String,
@@ -79,6 +89,8 @@ impl TestApp {
 
 // Cria uma nova instância da API
 pub async fn create_app() -> TestApp {
+    lazy_static::initialize(&TRACING);
+
     // Randomise configuration to ensure test isolation
     let configuration = {
         let mut c = get_configuration().expect("Failed to read configuration.");
